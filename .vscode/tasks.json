@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "task g++",
+			"command": "D:/zsc17/ITLearning/configurationFiles/MinGW64/bin/g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-g",
+				"${file}",
+				"-o",
+				"${fileDirname}\\${fileBasenameNoExtension}.exe"
+			],
+			"options": {
+				"cwd": "D:/zsc17/ITLearning/configurationFiles/MinGW64/bin"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "编译器: D:/zsc17/ITLearning/configurationFiles/MinGW64/bin/g++.exe"
+		}
+	]
+}
