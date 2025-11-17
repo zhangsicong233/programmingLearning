@@ -5,6 +5,21 @@
         "*.dbclient-js": "javascript",
         "iostream": "cpp"
     },
+    "C_Cpp.default.compilerPath": "/usr/bin/clang++",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    // 禁用C/C++扩展的IntelliSense以避免冲突
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "C_Cpp.autocomplete": "disabled",
+    "C_Cpp.errorSquiggles": "disabled",
+    // [[ Termianl ]]
+    "terminal.integrated.fontSize": 15, // 集成终端字号
+    "terminal.integrated.tabs.showActions": "always", // 始终显示“新建终端”按钮旁的“终端拆分”和“终止”按钮
+    "terminal.integrated.tabs.showActiveTerminal": "always", // 始终显示活动终端
+    "terminal.integrated.gpuAcceleration": "on", // 集成终端使用GPU加速
+    // [[ C++ ]]
+    // CMake
     "cmake.configureOnOpen": true,
     "cmake.generator": "Unix Makefiles",
     "cmake.buildDirectory": "${workspaceFolder}/build",
@@ -15,25 +30,20 @@
         "-DCMAKE_C_COMPILER=clang",
         "-DCMAKE_CXX_COMPILER=clang++",
         "-DCMAKE_BUILD_TYPE=Debug",
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=1"
     ],
-    "C_Cpp.default.compilerPath": "/usr/bin/clang++",
-    "C_Cpp.default.cppStandard": "c++17",
-    "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     // clangd 配置
     "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": [
+        "--all-scopes-completion", // 全局补全(补全建议会给出在当前作用域不可见的索引,插入后自动补充作用域标识符),例如在main()中直接写cout,即使没有`#include <iostream>`,也会给出`std::cout`的建议,配合"--header-insertion=iwyu",还可自动插入缺失的头文件
         "--background-index",
         "--clang-tidy",
+        "--clang-tidy-checks=performance-*, bugprone-*, misc-*, google-*, modernize-*, readability-*, portability-*",
+        "--completion-parse=auto", // 当 clangd 准备就绪时，用它来分析建议
         "--completion-style=detailed",
         "--header-insertion=never",
         "--pch-storage=memory",
         "--pretty",
         "--query-driver=/usr/bin/clang++"
     ],
-    // 禁用C/C++扩展的IntelliSense以避免冲突
-    "C_Cpp.intelliSenseEngine": "disabled",
-    "C_Cpp.autocomplete": "disabled",
-    "C_Cpp.errorSquiggles": "disabled"
 }
