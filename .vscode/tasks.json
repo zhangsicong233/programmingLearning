@@ -2,24 +2,63 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "cppbuild",
-			"label": "task g++",
-			"command": "D:/zsc17/ITLearning/configurationFiles/MinGW64/bin/g++.exe",
+			"label": "C/C++: clang++ 生成活动文件",
+			"type": "shell",
+			"command": "bash",
 			"args": [
-				"-fdiagnostics-color=always",
-				"-g",
-				"${file}",
-				"-o",
-				"${fileDirname}\\${fileBasenameNoExtension}.exe"
+				"-c",
+				"mkdir -p ${workspaceFolder}/build && /usr/bin/clang++ -fdiagnostics-color=always -g ${file} -o ${workspaceFolder}/build/${fileBasenameNoExtension} -std=c++17 -Wall -Wextra -Wpedantic"
 			],
-			"options": {
-				"cwd": "D:/zsc17/ITLearning/configurationFiles/MinGW64/bin"
-			},
+			"group": "build",
+			"detail": "编译器: /usr/bin/clang++",
 			"problemMatcher": [
 				"$gcc"
 			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			}
+		},
+		{
+			"label": "CMake: 配置",
+			"type": "shell",
+			"command": "cmake",
+			"args": [
+				"-B",
+				"${workspaceFolder}/build",
+				"-DCMAKE_C_COMPILER=clang",
+				"-DCMAKE_CXX_COMPILER=clang++",
+				"-DCMAKE_BUILD_TYPE=Debug",
+				"-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+			],
 			"group": "build",
-			"detail": "编译器: D:/zsc17/ITLearning/configurationFiles/MinGW64/bin/g++.exe"
+			"detail": "CMake 配置项目"
+		},
+		{
+			"label": "CMake: 构建",
+			"type": "shell",
+			"command": "cmake",
+			"args": [
+				"--build",
+				"${workspaceFolder}/build"
+			],
+			"group": "build",
+			"detail": "CMake 构建项目"
+		},
+		{
+			"label": "清理构建目录",
+			"type": "shell",
+			"command": "rm",
+			"args": [
+				"-rf",
+				"${workspaceFolder}/build"
+			],
+			"group": "build",
+			"detail": "清理构建目录"
 		}
 	]
 }
