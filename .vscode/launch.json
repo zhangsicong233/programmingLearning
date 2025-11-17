@@ -24,56 +24,6 @@
             ],
             "preLaunchTask": "C/C++: clang++ 生成活动文件",
             "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "CMake: 调试 (Clang)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/hello_world",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "为 gdb 启用整齐打印",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "将反汇编风格设置为 Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "CMake: 构建"
-        },
-        {
-            "name": "CMake: 调试职工管理系统",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/employee_management_system",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "为 gdb 启用整齐打印",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "将反汇编风格设置为 Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "CMake: 构建"
         }
     ]
 }
