@@ -9,7 +9,7 @@ CompileFlags:
 
 Diagnostics:
   ClangTidy:
-    Check:
+    Checks:
       - clang-analyzer-*
       - performance-*
       - readability-*
@@ -25,7 +25,7 @@ Hover:
   ShowAKA: Yes
 
 Completion:
-  IncludeSnippets: Yes
+  InsertInclude: true
 
 InlayHints:
   Designators: Yes
