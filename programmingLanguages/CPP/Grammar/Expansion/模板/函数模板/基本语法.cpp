@@ -3,14 +3,14 @@
 // 函数模板
 
 // 实现两个整型交换的函数
-void swapInt(int &x, int &y) {
+void swapInt(int& x, int& y) {
   int temp = x;
   x = y;
   y = temp;
 }
 
 // 实现两个浮点型交换的函数
-void swapDouble(double &x, double &y) {
+void swapDouble(double& x, double& y) {
   double temp = x;
   x = y;
   y = temp;
@@ -18,7 +18,8 @@ void swapDouble(double &x, double &y) {
 
 // 函数模板
 // 声明一个模板， 告诉编译器后面代码总紧跟的 T 不要报错，T 是一个通用数据类型
-template <typename T> void mySwap(T &x, T &y) {
+template <typename T>
+void mySwap(T& x, T& y) {
   T temp = x;
   x = y;
   y = temp;

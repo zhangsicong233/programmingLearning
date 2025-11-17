@@ -5,13 +5,17 @@
 // 2、模板必须要确定出 T 的数据类型，才可以使用
 
 // typename 可以替换为 class
-template <typename T> void mySwap(T &x, T &y) {
+template <typename T>
+void mySwap(T& x, T& y) {
   T temp = x;
   x = y;
   y = temp;
 }
 
-template <class T> void func() { std::cout << "func() 调用" << std::endl; }
+template <class T>
+void func() {
+  std::cout << "func() 调用" << std::endl;
+}
 
 void test01() {
   int a = 10;

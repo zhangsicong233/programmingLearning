@@ -7,12 +7,15 @@
 
 int myAdd01(int x, int y) { return x + y; }
 
-template <class T> T myAdd(T x, T y) { return x + y; }
+template <class T>
+T myAdd(T x, T y) {
+  return x + y;
+}
 
 void test01() {
   int a = 10;
   int b = 20;
-  char c = 'c'; // 'a' = 97
+  char c = 'c';  // 'a' = 97
 
   std::cout << myAdd01(a, c) << std::endl;
 

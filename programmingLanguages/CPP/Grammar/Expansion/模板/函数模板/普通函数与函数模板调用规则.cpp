@@ -8,11 +8,13 @@
 
 void myPrint(int x, int y) { std::cout << "调用的普通函数" << std::endl; }
 
-template <class T> void myPrint(T x, T y) {
+template <class T>
+void myPrint(T x, T y) {
   std::cout << "调用的是模板" << std::endl;
 }
 
-template <class T> void myPrint(T x, T y, T z) {
+template <class T>
+void myPrint(T x, T y, T z) {
   std::cout << "调用重载的模板" << std::endl;
 }
 

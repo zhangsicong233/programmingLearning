@@ -1,12 +1,14 @@
 #include <iostream>
 
-template <class T> void mySwap(T &x, T &y) {
+template <class T>
+void mySwap(T& x, T& y) {
   T temp = x;
   x = y;
   y = temp;
 }
 
-template <class T> void mySort(T *arr, int len) {
+template <class T>
+void mySort(T* arr, int len) {
   for (int i = 0; i < len; ++i) {
     int max = i;
     for (int j = i; j < len; ++j) {
@@ -21,7 +23,8 @@ template <class T> void mySort(T *arr, int len) {
   }
 }
 
-template <class T> void printArr(const T &arr, int len) {
+template <class T>
+void printArr(const T& arr, int len) {
   for (int i = 0; i < len; ++i) {
     std::cout << arr[i] << " ";
   }

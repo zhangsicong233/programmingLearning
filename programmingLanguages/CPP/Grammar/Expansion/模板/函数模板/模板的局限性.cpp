@@ -4,7 +4,7 @@
 // 模板并不是万能的，有些特定数据类型，需要用具体化方式做特殊实现
 
 class Person {
-public:
+ public:
   Person() {}
   Person(std::string name, int age) {
     this->m_Name = name;
@@ -16,7 +16,8 @@ public:
 };
 
 // 对比两个数据是否相等的函数
-template <class T> bool myCompare(T &a, T &b) {
+template <class T>
+bool myCompare(T& a, T& b) {
   if (a == b) {
     return true;
   } else {
@@ -25,7 +26,8 @@ template <class T> bool myCompare(T &a, T &b) {
 }
 
 // 利用具体化 Person 的版本实现代码, 具体化优先调用
-template <> bool myCompare(Person &p1, Person &p2) {
+template <>
+bool myCompare(Person& p1, Person& p2) {
   if (p1.m_Name == p2.m_Name && p1.m_Age == p2.m_Age) {
     return true;
   } else {
