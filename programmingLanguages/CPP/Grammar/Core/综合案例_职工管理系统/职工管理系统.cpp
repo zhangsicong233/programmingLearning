@@ -1,10 +1,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "Boss.h"
-#include "Employee.h"
-#include "Manager.h"
-#include "Worker.h"
 #include "WorkerManager.h"
 
 int main() {
@@ -17,56 +13,56 @@ int main() {
     std::cin >> choice;
 
     switch (choice) {
-      case 1: {
-        wm.addEmp();
-      }
+    case 1: {
+      wm.addEmp();
+    }
 
+    break;
+
+    case 2: {
+      wm.showEmp();
+    }
+
+    break;
+
+    case 3: {
+      wm.deleteEmp();
+    }
+
+    break;
+
+    case 4: {
+      wm.modifyEmp();
+    }
+
+    break;
+
+    case 5: {
+      wm.findEmp();
+    }
+
+    break;
+
+    case 6: {
+      wm.sortEmp();
+    }
+
+    break;
+
+    case 7: {
+      wm.clearFile();
+    }
+
+    break;
+
+    case 0: {
+      wm.exitSystem();
+    }
+
+    break;
+
+    default:
       break;
-
-      case 2: {
-        wm.showEmp();
-      }
-
-      break;
-
-      case 3: {
-        wm.deleteEmp();
-      }
-
-      break;
-
-      case 4: {
-        wm.modifyEmp();
-      }
-
-      break;
-
-      case 5: {
-        wm.findEmp();
-      }
-
-      break;
-
-      case 6: {
-        wm.sortEmp();
-      }
-
-      break;
-
-      case 7: {
-        wm.clearFile();
-      }
-
-      break;
-
-      case 0: {
-        wm.exitSystem();
-      }
-
-      break;
-
-      default:
-        break;
     }
 
     system("bash -c 'read -p \"Press Enter to continue...\"'");
