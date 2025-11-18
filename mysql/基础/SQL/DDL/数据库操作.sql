@@ -1,0 +1,19 @@
+-- 展示所有数据库
+-- SHOW DATABASES;
+SHOW DATABASES;
+
+-- 创建数据库
+-- CREATE DATABASE 数据库名;
+CREATE DATABASE IF NOT EXISTS test;
+
+-- 切换数据库
+-- USE DATEBASE 数据库名;
+USE test;
+
+-- 查看当前数据库
+-- SELECT DATABASE();
+SELECT DATABASE();
+
+-- 删除数据库
+-- DROP DATABASE (数据库名);
+DROP DATABASE IF EXISTS test;
