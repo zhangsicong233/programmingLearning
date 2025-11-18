@@ -1,18 +1,25 @@
 #include <bits/stdc++.h>
 
-const int N = 1e5 + 5;
-int lenX, lenY, lenRes;
-int x[N], y[N], res[N];
+std::vector<int> x, y, res;
 
-void highPrecisionAdd(int* x, int* y, int* res) {
-  for (int i = 0; i < lenRes; ++i) {
-    res[i] += x[i] + y[i];
-    res[i + 1] = res[i] / 10;
-    res[i] %= 10;
+void highPrecisionAdd(const std::vector<int>& x, const std::vector<int>& y,
+                      std::vector<int>& res) {
+  int temp = 0;
+  for (int i = 0; i < x.size() || i < y.size(); ++i) {
+    if (i < x.size()) {
+      temp += x[i];
+    }
+
+    if (i < y.size()) {
+      temp += y[i];
+    }
+
+    res.push_back(temp % 10);
+    temp /= 10;
   }
 
-  if (res[lenRes]) {
-    ++lenRes;
+  if (temp) {
+    res.push_back(temp);
   }
 }
 
@@ -20,21 +27,17 @@ int main() {
   std::string a, b;
   std::cin >> a >> b;
 
-  lenX = a.size();
-  lenY = b.size();
-  lenRes = std::max(lenX, lenY);
-
-  for (int i = lenX - 1; i >= 0; --i) {
-    x[lenX - 1 - i] = a[i] - '0';
+  for (int i = a.size() - 1; i >= 0; --i) {
+    x.push_back(a[i] - '0');
   }
 
-  for (int i = lenY - 1; i >= 0; --i) {
-    y[lenY - 1 - i] = b[i] - '0';
+  for (int i = b.size() - 1; i >= 0; --i) {
+    y.push_back(b[i] - '0');
   }
 
   highPrecisionAdd(x, y, res);
 
-  for (int i = lenRes - 1; i >= 0; --i) {
+  for (int i = res.size() - 1; i >= 0; --i) {
     std::cout << res[i];
   }
   std::cout << '\n';
