@@ -1,7 +1,5 @@
 #include <bits/stdc++.h>
 
-std::vector<int> x, y, res;
-
 void highPrecisionAdd(const std::vector<int>& x, const std::vector<int>& y,
                       std::vector<int>& res) {
   int temp = 0;
@@ -26,6 +24,8 @@ void highPrecisionAdd(const std::vector<int>& x, const std::vector<int>& y,
 int main() {
   std::string a, b;
   std::cin >> a >> b;
+
+  std::vector<int> x, y, res;
 
   for (int i = a.size() - 1; i >= 0; --i) {
     x.push_back(a[i] - '0');
