@@ -36,4 +36,6 @@ int main() {
     std::cout << res[i];
   }
   std::cout << '\n';
+
+  return 0;
 }
