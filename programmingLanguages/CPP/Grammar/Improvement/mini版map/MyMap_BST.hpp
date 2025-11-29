@@ -19,7 +19,7 @@ struct TreeNode {
 };
 
 template <typename Key, typename T>
-class MyMap {
+class BSTMap {
  private:
   TreeNode<Key, T>* _root;
 
@@ -133,10 +133,10 @@ class MyMap {
   };
 
  public:
-  MyMap() : _root(nullptr) {}
+  BSTMap() : _root(nullptr) {}
 
-  MyMap(const MyMap&) = delete;
-  MyMap& operator=(const MyMap&) = delete;
+  BSTMap(const BSTMap&) = delete;
+  BSTMap& operator=(const BSTMap&) = delete;
 
   TreeNode<Key, T>* find(const Key& key) const {
     auto* curr = _root;
@@ -223,5 +223,5 @@ class MyMap {
     _root = nullptr;
   }
 
-  ~MyMap() { clear(_root); }
+  ~BSTMap() { clear(_root); }
 };
