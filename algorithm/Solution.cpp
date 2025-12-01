@@ -1,11 +1,9 @@
 #include <bits/stdc++.h>
 
-#define int long long
-
-void Solution() {}
+void solution() {}
 
 signed main() {
-  Solution();
+  solution();
 
   return 0;
 }
