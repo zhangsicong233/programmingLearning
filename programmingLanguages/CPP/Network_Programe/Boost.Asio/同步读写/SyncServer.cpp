@@ -11,7 +11,9 @@
 #include <set>
 
 constexpr int MAX_LENGTH = 1024;
-typedef std::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
+
+using socket_ptr = std::shared_ptr<boost::asio::ip::tcp::socket>;
+
 std::set<std::shared_ptr<std::thread>> thread_set;
 
 // 服务端处理客户端连接
@@ -35,7 +37,6 @@ void session(socket_ptr sock) {
 
       std::cout << "receive from "
                 << sock->remote_endpoint().address().to_string() << std::endl;
-    std:
       std::cout << "receive message is " << data << std::endl;
 
       // 回传给对方
