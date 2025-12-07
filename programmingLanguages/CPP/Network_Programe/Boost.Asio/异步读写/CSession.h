@@ -9,8 +9,8 @@
 #include <mutex>
 #include <queue>
 
-constexpr int MAX_LENGTH = 1024 * 2;
-constexpr int HEAD_LENGTH = 2;
+#define MAX_LENGTH 1024 * 2
+#define HEAD_LENGTH 2
 
 class CServer;
 
@@ -38,42 +38,42 @@ class MsgNode {
   }
 
  private:
-  short _total_len;
   short _cur_len;
+  short _total_len;
   char* _data;
 };
 
 class CSession : public std::enable_shared_from_this<CSession> {
  public:
-  CSession(boost::asio::io_context& ioc, CServer* server)
-      : _socket(ioc), _server(server) {
-    boost::uuids::uuid a_uuid = boost::uuids::random_generator()();
-    _uuid = boost::uuids::to_string(a_uuid);
-  }
+  CSession(boost::asio::io_context& ioc, CServer* server);
 
   boost::asio::ip::tcp::socket& Socket() { return _socket; }
-
   void Start();
   void Send(char* msg, int max_length);
   std::string& GetUuid();
+
+  ~CSession();
 
  private:
   boost::asio::ip::tcp::socket _socket;
   enum { _max_length = 1024 };
   char _data[_max_length];
+
   CServer* _server;
   std::string _uuid;
-  std::queue<std::shared_ptr<MsgNode> > _send_que;
+
   std::mutex _send_lock;
-  // 收到的消息结构
-  std::shared_ptr<MsgNode> _recv_msg_node;
+  std::queue<std::shared_ptr<MsgNode>> _send_que;
+
   bool _b_head_parse;
   // 收到的头部结构
   std::shared_ptr<MsgNode> _recv_head_node;
+  // 收到的消息结构
+  std::shared_ptr<MsgNode> _recv_msg_node;
 
   void HandleRead(const boost::system::error_code& error,
                   size_t bytes_transferred,
-                  std::shared_ptr<CSession> _self_shared);
+                  std::shared_ptr<CSession> self_shared);
   void HandleWrite(const boost::system::error_code& error,
-                   std::shared_ptr<CSession> _self_shared);
+                   std::shared_ptr<CSession> self_shared);
 };
