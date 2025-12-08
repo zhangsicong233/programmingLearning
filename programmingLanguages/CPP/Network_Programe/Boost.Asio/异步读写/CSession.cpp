@@ -5,13 +5,11 @@
 #include "CServer.h"
 
 CSession::CSession(boost::asio::io_context& ioc, CServer* server)
-    : _socket(ioc),
-      _server(server),
-      _b_head_parse(false),
-      _recv_head_node(std::make_shared<MsgNode>(HEAD_LENGTH)) {
+    : _socket(ioc), _server(server), _b_head_parse(false), _b_close(false) {
   boost::uuids::uuid a_uuid = boost::uuids::random_generator()();
   _uuid = boost::uuids::to_string(a_uuid);
 
+  _recv_head_node = std::make_shared<MsgNode>(HEAD_LENGTH);
   _recv_msg_node = nullptr;
 }
 
@@ -64,6 +62,12 @@ void CSession::Send(char* msg, int max_length) {
       _socket, boost::asio::buffer(msg_node->_data, msg_node->_total_len),
       std::bind(&CSession::HandleWrite, this, std::placeholders::_1,
                 shared_from_this()));
+}
+
+void CSession::Close() {
+  _socket.close();
+
+  _b_close = true;
 }
 
 std::string& CSession::GetUuid() { return _uuid; }
@@ -183,6 +187,8 @@ void CSession::HandleRead(const boost::system::error_code& error,
     }
   } else {
     std::cout << "handle read failed, error is " << error.what() << std::endl;
+
+    Close();
 
     _server->ClearSession(_uuid);
   }

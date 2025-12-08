@@ -57,6 +57,7 @@ class CSession : public std::enable_shared_from_this<CSession> {
   boost::asio::ip::tcp::socket& Socket() { return _socket; }
   void Start();
   void Send(char* msg, int max_length);
+  void Close();
   std::string& GetUuid();
 
   ~CSession();
@@ -77,6 +78,8 @@ class CSession : public std::enable_shared_from_this<CSession> {
   std::shared_ptr<MsgNode> _recv_head_node;
   // 收到的消息结构
   std::shared_ptr<MsgNode> _recv_msg_node;
+
+  bool _b_close;
 
   void HandleRead(const boost::system::error_code& error,
                   size_t bytes_transferred,
