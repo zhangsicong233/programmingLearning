@@ -3,11 +3,14 @@
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <cstring>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <thread>
 
 #define MAX_LENGTH 1024 * 2
 #define HEAD_LENGTH 2
@@ -60,7 +63,7 @@ class CSession : public std::enable_shared_from_this<CSession> {
 
  private:
   boost::asio::ip::tcp::socket _socket;
-  enum { _max_length = 1024 };
+  enum { _max_length = MAX_LENGTH };
   char _data[_max_length];
 
   CServer* _server;

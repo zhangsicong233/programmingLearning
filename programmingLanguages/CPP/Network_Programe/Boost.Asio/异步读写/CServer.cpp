@@ -24,14 +24,21 @@ void CServer::start_accept() {
 void CServer::handle_accept(std::shared_ptr<CSession> new_session,
                             const boost::system::error_code& error) {
   if (!error) {
+    std::cout << "New session accepted " << std::endl;
+
     new_session->Start();
 
     _sessions.insert(std::make_pair(new_session->GetUuid(), new_session));
   } else {
-    // delete new_session;
+    std::cout << "Accept error: " << error.message() << std::endl;
   }
 
   start_accept();
 }
 
-void CServer::ClearSession(std::string uuid) { _sessions.erase(uuid); }
+void CServer::ClearSession(std::string uuid) {
+  auto it = _sessions.find(uuid);
+  if (it != _sessions.end()) {
+    _sessions.erase(it);
+  }
+}

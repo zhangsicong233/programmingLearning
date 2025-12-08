@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "CServer.h"
-#include "CSession.h"
 
 int main() {
   try {

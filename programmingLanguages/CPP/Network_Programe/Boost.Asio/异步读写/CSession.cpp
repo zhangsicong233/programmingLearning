@@ -5,12 +5,19 @@
 #include "CServer.h"
 
 CSession::CSession(boost::asio::io_context& ioc, CServer* server)
-    : _socket(ioc), _server(server) {
+    : _socket(ioc),
+      _server(server),
+      _b_head_parse(false),
+      _recv_head_node(std::make_shared<MsgNode>(HEAD_LENGTH)) {
   boost::uuids::uuid a_uuid = boost::uuids::random_generator()();
   _uuid = boost::uuids::to_string(a_uuid);
+
+  _recv_msg_node = nullptr;
 }
 
 void CSession::Start() {
+  std::cout << "CSession started, waiting for data..." << std::endl;
+
   memset(_data, 0, _max_length);
 
   _socket.async_read_some(
@@ -22,10 +29,19 @@ void CSession::Start() {
 void CSession::Send(char* msg, int max_length) {
   bool pending = false;
   std::unique_lock<std::mutex> lock(_send_lock);
+
   int send_que_size = _send_que.size();
   if (send_que_size > MAX_SENDQUE) {
     std::cout << "session: " << _uuid << " send que fulled, size is "
               << MAX_SENDQUE << std::endl;
+
+    return;
+  }
+
+  // 确保 max_length 在合理范围内
+  if (max_length <= 0 || max_length > MAX_LENGTH) {
+    std::cout << "Invalid message length: " << max_length << std::endl;
+
     return;
   }
 
@@ -33,22 +49,26 @@ void CSession::Send(char* msg, int max_length) {
     pending = true;
   }
 
-  _send_que.push(std::make_shared<MsgNode>(msg, max_length));
+  // 创建消息节点
+  std::shared_ptr<MsgNode> msg_node =
+      std::make_shared<MsgNode>(msg, max_length);
+  _send_que.push(msg_node);
+
   if (pending) {
     return;
   }
 
+  // 发送数据
+  std::cout << "Sending response, length: " << max_length << std::endl;
   boost::asio::async_write(
-      _socket, boost::asio::buffer(msg, max_length),
+      _socket, boost::asio::buffer(msg_node->_data, msg_node->_total_len),
       std::bind(&CSession::HandleWrite, this, std::placeholders::_1,
                 shared_from_this()));
 }
 
 std::string& CSession::GetUuid() { return _uuid; }
 
-CSession::~CSession() {
-  std::cout << "session destruct: " << _uuid << std::endl;
-}
+CSession::~CSession() { std::cout << "session destruct" << std::endl; }
 
 void CSession::HandleRead(const boost::system::error_code& error,
                           size_t bytes_transferred,
@@ -86,11 +106,11 @@ void CSession::HandleRead(const boost::system::error_code& error,
         // 获取头部数据
         short data_len = 0;
         memcpy(&data_len, _recv_head_node->_data, HEAD_LENGTH);
-        std::cout << "data_len is " << data_len << std::endl;
 
         // 网络字节序转化为本地字节序
         data_len =
             boost::asio::detail::socket_ops::network_to_host_short(data_len);
+        std::cout << "converted data_len is " << data_len << std::endl;
 
         // 头部长度非法
         if (data_len > MAX_LENGTH) {
@@ -172,6 +192,13 @@ void CSession::HandleWrite(const boost::system::error_code& error,
                            std::shared_ptr<CSession> self_shared) {
   if (!error) {
     std::unique_lock<std::mutex> lock(_send_lock);
+    // 获取刚发送的消息
+    auto sent_msg = _send_que.front();
+    short sent_len = 0;
+    memcpy(&sent_len, sent_msg->_data, HEAD_LENGTH);
+    sent_len = boost::asio::detail::socket_ops::network_to_host_short(sent_len);
+    std::cout << "Successfully sent message, length: " << sent_len << std::endl;
+
     _send_que.pop();
     if (!_send_que.empty()) {
       auto& msgnode = _send_que.front();
