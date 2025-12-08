@@ -22,6 +22,13 @@ void CSession::Start() {
 void CSession::Send(char* msg, int max_length) {
   bool pending = false;
   std::unique_lock<std::mutex> lock(_send_lock);
+  int send_que_size = _send_que.size();
+  if (send_que_size > MAX_SENDQUE) {
+    std::cout << "session: " << _uuid << " send que fulled, size is "
+              << MAX_SENDQUE << std::endl;
+    return;
+  }
+
   if (_send_que.size() > 0) {
     pending = true;
   }
@@ -80,6 +87,10 @@ void CSession::HandleRead(const boost::system::error_code& error,
         short data_len = 0;
         memcpy(&data_len, _recv_head_node->_data, HEAD_LENGTH);
         std::cout << "data_len is " << data_len << std::endl;
+
+        // 网络字节序转化为本地字节序
+        data_len =
+            boost::asio::detail::socket_ops::network_to_host_short(data_len);
 
         // 头部长度非法
         if (data_len > MAX_LENGTH) {
