@@ -1,13 +1,14 @@
 #include "CSession.h"
 
-#include <jsoncpp/json/json.h>
-#include <jsoncpp/json/reader.h>
-#include <jsoncpp/json/value.h>
+#include <json/json.h>
+#include <json/reader.h>
+#include <json/value.h>
 
 #include <iostream>
 #include <sstream>
 
 #include "CServer.h"
+#include "LogicSystem.h"
 
 CSession::CSession(boost::asio::io_context& io_context, CServer* server)
     : _socket(io_context),
@@ -133,36 +134,32 @@ void CSession::HandleRead(const boost::system::error_code& error,
           // 更新已处理的data长度和剩余未处理的长度
           copy_len += head_remain;
           bytes_transferred -= head_remain;
-
-          // 获取头部 MSGID 数据
+          // 获取头部MSGID数据
           short msg_id = 0;
           memcpy(&msg_id, _recv_head_node->_data, HEAD_ID_LEN);
-          // 网络字节序转为本地字节序
+          // 网络字节序转化为本地字节序
           msg_id =
               boost::asio::detail::socket_ops::network_to_host_short(msg_id);
-          std::cout << "msg id is " << msg_id << std::endl;
-
-          // id 非法
+          std::cout << "msg_id is " << msg_id << endl;
+          // id非法
           if (msg_id > MAX_LENGTH) {
-            std::cout << "invalid msg_id is " << msg_id << std::endl;
+            std::cout << "invalid msg_id is " << msg_id << endl;
             _server->ClearSession(_uuid);
-
             return;
           }
-
-          // 获取头部长度数据
           short msg_len = 0;
           memcpy(&msg_len, _recv_head_node->_data + HEAD_ID_LEN, HEAD_DATA_LEN);
           // 网络字节序转化为本地字节序
           msg_len =
               boost::asio::detail::socket_ops::network_to_host_short(msg_len);
-          std::cout << "data_len is " << msg_len << endl;
-          // 头部长度非法
+          std::cout << "msg_len is " << msg_len << endl;
+          // id非法
           if (msg_len > MAX_LENGTH) {
             std::cout << "invalid data length is " << msg_len << endl;
             _server->ClearSession(_uuid);
             return;
           }
+
           _recv_msg_node = make_shared<RecvNode>(msg_len, msg_id);
 
           // 消息的长度小于头部规定的长度，说明数据未收全，则先将部分消息放到接收节点里
@@ -187,18 +184,10 @@ void CSession::HandleRead(const boost::system::error_code& error,
           bytes_transferred -= msg_len;
           _recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
           // cout << "receive data is " << _recv_msg_node->_data << endl;
-          // 此处可以调用Send发送测试
-          Json::Reader reader;
-          Json::Value root;
-          reader.parse(
-              std::string(_recv_msg_node->_data, _recv_msg_node->_total_len),
-              root);
-          std::cout << "recevie msg id  is " << root["id"].asInt()
-                    << " msg data is " << root["data"].asString() << endl;
-          root["data"] =
-              "server has received msg, msg data is " + root["data"].asString();
-          std::string return_str = root.toStyledString();
-          Send(return_str, root["id"].asInt());
+          // 此处将消息投递到逻辑队列中
+          LogicSystem::GetInstance()->PostMsgToQue(
+              make_shared<LogicNode>(shared_from_this(), _recv_msg_node));
+
           // 继续轮询剩余未处理数据
           _b_head_parse = false;
           _recv_head_node->Clear();
@@ -234,18 +223,10 @@ void CSession::HandleRead(const boost::system::error_code& error,
         copy_len += remain_msg;
         _recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
         // cout << "receive data is " << _recv_msg_node->_data << endl;
-        // 此处可以调用Send发送测试
-        Json::Reader reader;
-        Json::Value root;
-        reader.parse(
-            std::string(_recv_msg_node->_data, _recv_msg_node->_total_len),
-            root);
-        std::cout << "recevie msg id  is " << root["id"].asInt()
-                  << " msg data is " << root["data"].asString() << endl;
-        root["data"] =
-            "server has received msg, msg data is " + root["data"].asString();
-        std::string return_str = root.toStyledString();
-        Send(return_str, root["id"].asInt());
+        // 此处将消息投递到逻辑队列中
+        LogicSystem::GetInstance()->PostMsgToQue(
+            make_shared<LogicNode>(shared_from_this(), _recv_msg_node));
+
         // 继续轮询剩余未处理数据
         _b_head_parse = false;
         _recv_head_node->Clear();
@@ -268,3 +249,7 @@ void CSession::HandleRead(const boost::system::error_code& error,
     std::cout << "Exception code is " << e.what() << endl;
   }
 }
+
+LogicNode::LogicNode(shared_ptr<CSession> session,
+                     shared_ptr<RecvNode> recvnode)
+    : _session(session), _recvnode(recvnode) {}

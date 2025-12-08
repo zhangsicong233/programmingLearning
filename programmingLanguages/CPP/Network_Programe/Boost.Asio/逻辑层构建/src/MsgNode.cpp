@@ -1,5 +1,6 @@
 #include "MsgNode.h"
 
+#include "LogicSystem.h"
 #include "const.h"
 
 MsgNode::MsgNode(short max_len) : _total_len(max_len), _cur_len(0) {

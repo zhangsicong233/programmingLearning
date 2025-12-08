@@ -1,6 +1,3 @@
-// SyncClient.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
-
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/value.h>
@@ -41,7 +38,7 @@ int main() {
     int msgid = 1001;
     int msgid_host =
         boost::asio::detail::socket_ops::host_to_network_short(msgid);
-    memcpy(send_data, &msgid, 2);
+    memcpy(send_data, &msgid_host, 2);
     // 转为网络字节序
     int request_host_length =
         boost::asio::detail::socket_ops::host_to_network_short(request_length);
@@ -50,16 +47,18 @@ int main() {
     boost::asio::write(sock,
                        boost::asio::buffer(send_data, request_length + 4));
     cout << "begin to receive..." << endl;
+
     char reply_head[HEAD_TOTAL];
     size_t reply_length =
         boost::asio::read(sock, boost::asio::buffer(reply_head, HEAD_TOTAL));
+
     msgid = 0;
     memcpy(&msgid, reply_head, HEAD_LENGTH);
     short msglen = 0;
     memcpy(&msglen, reply_head + 2, HEAD_LENGTH);
     // 转为本地字节序
-    msgid = boost::asio::detail::socket_ops::network_to_host_short(msgid);
     msglen = boost::asio::detail::socket_ops::network_to_host_short(msglen);
+    msgid = boost::asio::detail::socket_ops::network_to_host_short(msgid);
     char msg[MAX_LENGTH] = {0};
     size_t msg_length =
         boost::asio::read(sock, boost::asio::buffer(msg, msglen));
@@ -71,6 +70,5 @@ int main() {
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << endl;
   }
-
   return 0;
 }

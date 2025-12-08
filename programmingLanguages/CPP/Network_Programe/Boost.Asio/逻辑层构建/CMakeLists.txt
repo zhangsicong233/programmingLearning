@@ -1,65 +1,62 @@
 cmake_minimum_required(VERSION 3.10)
-project(LogicServerProject)
+project(LogicLayer VERSION 1.0.0)
 
 # 设置C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 设置输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# 查找jsoncpp库
-find_package(jsoncpp REQUIRED)
+# 包含目录
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# 包含当前目录
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+# 查找JsonCpp库
+find_package(PkgConfig)
+pkg_check_modules(JSONCPP jsoncpp)
 
-# 定义所有源文件
-set(COMMON_SOURCES
-    MsgNode.cpp
-)
-
-set(SERVER_SOURCES
-    CServer.cpp
-    CSession.cpp
-    LogicServer.cpp
-    ${COMMON_SOURCES}
-)
-
-set(CLIENT_SOURCES
-    LogicClient.cpp
-    ${COMMON_SOURCES}
-)
-
-# 添加服务器可执行文件
-add_executable(LogicServer ${SERVER_SOURCES})
-target_include_directories(LogicServer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(LogicServer jsoncpp_lib)
-
-# 添加客户端可执行文件
-add_executable(LogicClient ${CLIENT_SOURCES})
-target_include_directories(LogicClient PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(LogicClient jsoncpp_lib)
-
-# 可选：如果jsoncpp使用不同的包名，可以尝试以下别名
-if(NOT TARGET jsoncpp_lib)
-    # 尝试常见的jsoncpp目标名
-    if(TARGET jsoncpp)
-        add_library(jsoncpp_lib ALIAS jsoncpp)
-    elseif(TARGET jsoncpp::jsoncpp)
-        add_library(jsoncpp_lib ALIAS jsoncpp::jsoncpp)
-    elseif(TARGET JsonCpp::JsonCpp)
-        add_library(jsoncpp_lib ALIAS JsonCpp::JsonCpp)
+if(JSONCPP_FOUND)
+    include_directories(${JSONCPP_INCLUDE_DIRS})
+    link_directories(${JSONCPP_LIBRARY_DIRS})
+    set(JSONCPP_LIBRARIES ${JSONCPP_LIBRARIES})
+    message(STATUS "Found JsonCpp: ${JSONCPP_INCLUDE_DIRS}")
+else()
+    # 尝试使用find_package
+    find_package(jsoncpp REQUIRED)
+    if(jsoncpp_FOUND)
+        set(JSONCPP_LIBRARIES jsoncpp)
+        message(STATUS "Found JsonCpp via find_package")
+    else()
+        # 如果都找不到，尝试手动查找
+        find_path(JSONCPP_INCLUDE_DIR json/json.h
+            PATHS /usr/include /usr/local/include /opt/local/include
+            PATH_SUFFIXES jsoncpp)
+        
+        find_library(JSONCPP_LIBRARY 
+            NAMES jsoncpp
+            PATHS /usr/lib /usr/local/lib /opt/local/lib)
+        
+        if(JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
+            include_directories(${JSONCPP_INCLUDE_DIR})
+            set(JSONCPP_LIBRARIES ${JSONCPP_LIBRARY})
+            message(STATUS "Found JsonCpp manually: ${JSONCPP_LIBRARY}")
+        else()
+            message(FATAL_ERROR "JsonCpp library not found. Please install libjsoncpp-dev")
+        endif()
     endif()
 endif()
 
-# 设置编译器选项
-if(MSVC)
-    target_compile_options(LogicServer PRIVATE /W4)
-    target_compile_options(LogicClient PRIVATE /W4)
+# 查找Boost库
+find_package(Boost REQUIRED COMPONENTS system thread)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    message(STATUS "Found Boost: ${Boost_VERSION}")
 else()
-    target_compile_options(LogicServer PRIVATE -Wall -Wextra)
-    target_compile_options(LogicClient PRIVATE -Wall -Wextra)
+    message(FATAL_ERROR "Boost library not found. Please install libboost-dev")
 endif()
+
+# 添加子目录
+add_subdirectory(src)

@@ -4,6 +4,8 @@
 #include <cstring>
 #include <iostream>
 
+class LogicSystem;
+
 class MsgNode {
  public:
   MsgNode(short max_len);
@@ -18,6 +20,8 @@ class MsgNode {
 };
 
 class RecvNode : public MsgNode {
+  friend class LogicSystem;
+
  public:
   RecvNode(short max_len, short msg_id);
 
@@ -26,6 +30,8 @@ class RecvNode : public MsgNode {
 };
 
 class SendNode : public MsgNode {
+  friend class LogicSystem;
+
  public:
   SendNode(const char* msg, short max_len, short msg_id);
 

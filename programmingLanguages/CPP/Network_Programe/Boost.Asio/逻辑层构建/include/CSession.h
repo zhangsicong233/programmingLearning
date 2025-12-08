@@ -47,3 +47,15 @@ class CSession : public std::enable_shared_from_this<CSession> {
   // 收到的头部结构
   std::shared_ptr<MsgNode> _recv_head_node;
 };
+
+class LogicNode {
+  friend class LogicSystem;
+
+ public:
+  LogicNode(std::shared_ptr<CSession> session,
+            std::shared_ptr<RecvNode> recvnode);
+
+ private:
+  std::shared_ptr<CSession> _session;
+  std::shared_ptr<RecvNode> _recvnode;
+};
