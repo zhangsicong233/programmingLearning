@@ -216,6 +216,8 @@ void CSession::HandleWrite(const boost::system::error_code& error,
   } else {
     std::cout << "handle write failed, error is " << error.what() << std::endl;
 
+    Close();
+
     _server->ClearSession(_uuid);
   }
 }
