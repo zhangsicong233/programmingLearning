@@ -14,7 +14,7 @@ include_directories(${PROTOBUF_INCLUDE_DIRS})
 PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HEADER msg.proto)
 
 # Add your source files
-add_executable(ProtoBufDemo test.cpp ${PROTO_SRC})
+add_executable(test test.cpp ${PROTO_SRC})
 
 # Link protobuf library
-target_link_libraries(ProtoBufDemo ${PROTOBUF_LIBRARIES})
+target_link_libraries(test ${PROTOBUF_LIBRARIES})
