@@ -101,57 +101,18 @@ void CSession::HandleRead(const boost::system::error_code& error,
         }
 
         _recv_msg_node = std::make_shared<MsgNode>(data_len);
-        // 消息的长度小于头部规定的长度，说明数据未收全，则先将部分消息放到接收节点里
-        if (bytes_transferred < data_len) {
-          memcpy(_recv_msg_node->_data + _recv_msg_node->_cur_len,
-                 _data + copy_len, bytes_transferred);
-          _recv_msg_node->_cur_len += bytes_transferred;
 
-          ::memset(_data, 0, MAX_LENGTH);
-          _socket.async_read_some(
-              boost::asio::buffer(_data, MAX_LENGTH),
-              std::bind(&CSession::HandleRead, this, std::placeholders::_1,
-                        std::placeholders::_2, shared_self));
-
-          // 头部处理完成
-          _b_head_parse = true;
-
-          return;
-        }
-
-        memcpy(_recv_msg_node->_data + _recv_msg_node->_cur_len,
-               _data + copy_len, data_len);
-        _recv_msg_node->_cur_len += data_len;
-
-        copy_len += data_len;
-        bytes_transferred -= data_len;
-
-        _recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
-        std::cout << "receive data is " << _recv_msg_node->_data << std::endl;
-
-        // 此处可以调用Send发送测试
-        Send(_recv_msg_node->_data, _recv_msg_node->_total_len);
-
-        // 继续轮询剩余未处理数据
-        _b_head_parse = false;
-        _recv_head_node->Clear();
-
-        if (bytes_transferred <= 0) {
-          ::memset(_data, 0, MAX_LENGTH);
-          _socket.async_read_some(
-              boost::asio::buffer(_data, MAX_LENGTH),
-              std::bind(&CSession::HandleRead, this, std::placeholders::_1,
-                        std::placeholders::_2, shared_self));
-
-          return;
-        }
+        // 头部处理完成
+        _b_head_parse = true;
 
         continue;
       }
 
-      // 已经处理完头部，处理上次未接受完的消息数据
-      // 接收的数据仍不足剩余未处理的
+      // 已经处理完头部，处理消息数据
+      // 剩余消息长度
       int remain_msg = _recv_msg_node->_total_len - _recv_msg_node->_cur_len;
+
+      // 如果当前接收到的数据不够一条完整消息
       if (bytes_transferred < remain_msg) {
         memcpy(_recv_msg_node->_data + _recv_msg_node->_cur_len,
                _data + copy_len, bytes_transferred);
@@ -166,6 +127,7 @@ void CSession::HandleRead(const boost::system::error_code& error,
         return;
       }
 
+      // 当前接收到的数据足够一条完整消息
       memcpy(_recv_msg_node->_data + _recv_msg_node->_cur_len, _data + copy_len,
              remain_msg);
       _recv_msg_node->_cur_len += remain_msg;
@@ -173,16 +135,20 @@ void CSession::HandleRead(const boost::system::error_code& error,
       copy_len += remain_msg;
       bytes_transferred -= remain_msg;
 
+      // 消息处理完成，添加结束符并输出
       _recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
       std::cout << "receive data is " << _recv_msg_node->_data << std::endl;
-      // 此处可以调用Send发送测试
+
+      // 处理接收到的完整消息
       Send(_recv_msg_node->_data, _recv_msg_node->_total_len);
 
-      // 继续轮询剩余未处理数据
+      // 重置状态，准备处理下一条消息
       _b_head_parse = false;
       _recv_head_node->Clear();
 
+      // 如果还有剩余数据，继续循环处理
       if (bytes_transferred <= 0) {
+        // 数据已处理完，继续读取
         ::memset(_data, 0, MAX_LENGTH);
         _socket.async_read_some(
             boost::asio::buffer(_data, MAX_LENGTH),
@@ -192,6 +158,7 @@ void CSession::HandleRead(const boost::system::error_code& error,
         return;
       }
 
+      // 还有剩余数据，可能是下一条消息，继续循环处理
       continue;
     }
   } else {
