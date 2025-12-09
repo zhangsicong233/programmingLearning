@@ -1,16 +1,24 @@
+#include <condition_variable>
+#include <csignal>
 #include <iostream>
+#include <mutex>
+#include <thread>
 
 #include "CServer.h"
 
-using namespace std;
-
 int main() {
   try {
-    boost::asio::io_context io_context;
-    CServer s(io_context, 10086);
-    io_context.run();
+    boost::asio::io_context ioc;
+
+    boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
+    signals.async_wait([&ioc](auto, auto) { ioc.stop(); });
+
+    CServer s(ioc, 10086);
+
+    ioc.run();
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << endl;
   }
-  boost::asio::io_context io_context;
+
+  return 0;
 }

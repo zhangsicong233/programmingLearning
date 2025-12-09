@@ -14,7 +14,7 @@ void LogicSystem::PostMsgToQue(std::shared_ptr<LogicNode> msg) {
 }
 
 void LogicSystem::RegisterCallBacks() {
-  _fun_callback[MSG_HELLO_WORD] =
+  _fun_callback[MSG_HELLO_WORLD] =
       std::bind(&LogicSystem::HelloWordCallBack, this, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3);
 }
@@ -47,7 +47,6 @@ void LogicSystem::DealMsg() {
     // 判断如果为关闭状态，取出逻辑队列所有数据，及时处理并退出循环
     if (_b_stop) {
       while (!_msg_que.empty()) {
-        std::unique_lock<std::mutex> lock(_mutex);
         auto msg_node = _msg_que.front();
         std::cout << "recv msg id is " << msg_node->_recvnode->_msg_id
                   << std::endl;
