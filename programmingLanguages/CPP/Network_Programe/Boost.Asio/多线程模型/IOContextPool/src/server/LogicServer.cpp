@@ -17,7 +17,7 @@ int main() {
     signals.async_wait([&ioc, pool](auto, auto) {
       ioc.stop();
 
-      pool->Stop();
+      pool->stop();
     });
 
     CServer s(ioc, 10086);
